@@ -3,10 +3,29 @@ import firebaseConfig from '../apiKeys';
 
 const baseURL = firebaseConfig.databaseURL;
 
-const getTodos = () => new Promise((resolve, reject) => {
+const getTodos = (value) => new Promise((resolve, reject) => {
   axios
-    .get(`${baseURL}/todos.json`)
-    .then((response) => resolve(Object.values(response.data)))
+    .get(`${baseURL}/todos.json?orderBy="complete"&equalTo=${value}`)
+    .then((response) => {
+      if (response.data) {
+        resolve(Object.values(response.data));
+      } else {
+        resolve([]);
+      }
+    })
+    .catch(reject);
+});
+
+const getCompletedTodos = () => new Promise((resolve, reject) => {
+  getTodos(true)
+    .then((todoArray) => resolve(todoArray))
+    .catch(reject);
+});
+
+const deleteCompletedTodos = (firebaseKey) => new Promise((resolve, reject) => {
+  axios
+    .delete(`${baseURL}/todos/${firebaseKey}.json`)
+    .then(() => getCompletedTodos().then(resolve))
     .catch(reject);
 });
 
@@ -18,10 +37,31 @@ const createTodo = (obj) => new Promise((resolve, reject) => {
       axios
         .patch(`${baseURL}/todos/${firebaseKey}.json`, { firebaseKey })
         .then(() => {
-          getTodos().then(resolve);
+          getTodos(false).then(resolve);
         });
     })
     .catch(reject);
 });
 
-export { getTodos, createTodo };
+const deleteTodos = (firebaseKey) => new Promise((resolve, reject) => {
+  axios
+    .delete(`${baseURL}/todos/${firebaseKey}.json`)
+    .then(() => getTodos(false).then(resolve))
+    .catch(reject);
+});
+
+const updateTodos = (todoObj) => new Promise((resolve, reject) => {
+  axios
+    .patch(`${baseURL}/todos/${todoObj.firebaseKey}.json`, todoObj)
+    .then(() => getTodos(false).then(resolve))
+    .catch(reject);
+});
+
+export {
+  getTodos,
+  createTodo,
+  deleteTodos,
+  updateTodos,
+  getCompletedTodos,
+  deleteCompletedTodos,
+};
