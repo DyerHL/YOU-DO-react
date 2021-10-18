@@ -3,6 +3,7 @@ import { Route, Switch } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Completed from '../views/Completed';
 import Home from '../views/Home';
+import AllTodos from '../views/AllTodos';
 
 export default function Routes({ todos, setTodos, setEditItem }) {
   return (
@@ -15,7 +16,12 @@ export default function Routes({ todos, setTodos, setEditItem }) {
             <Home todos={todos} setTodos={setTodos} setEditItem={setEditItem} />
           )}
         />
-        <Route exact path="/completed" component={Completed} />
+        <Route
+          exact
+          path="/completed"
+          component={() => <Completed todos={todos} setTodos={setTodos} />}
+        />
+        <Route exact path="/all" component={AllTodos} />
       </Switch>
     </div>
   );

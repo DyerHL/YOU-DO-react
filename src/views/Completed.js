@@ -21,7 +21,7 @@ export default function Completed() {
           className="d-flex justify-content-between alert alert-light"
           role="alert"
         >
-          {completedTodo.name}
+          <h5>{completedTodo.name}</h5>
           <button
             onClick={() => handleClick(completedTodo.firebaseKey)}
             className="btn btn-danger"
